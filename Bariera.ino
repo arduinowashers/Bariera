@@ -48,3 +48,30 @@ int measureDistance() {
   return distance;
 }
 
+void loop() {
+  // Измерване на разстоянието
+  int distance = measureDistance();
+  
+  // Извеждане на разстоянието в серийния монитор за дебъгване
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Проверка дали има обект наблизо
+  if (distance <= DISTANCE_THRESHOLD && !isGateOpen) {
+    // Отваряне на бариерата
+    gateServo.write(GATE_OPEN);
+    isGateOpen = true;
+    gateOpenTime = millis();  // Запазване на времето на отваряне
+  }
+  
+  // Проверка дали е време за затваряне на бариерата
+  if (isGateOpen && (millis() - gateOpenTime >= GATE_DELAY)) {
+    // Затваряне на бариерата
+    gateServo.write(GATE_CLOSED);
+    isGateOpen = false;
+  }
+  
+  delay(100);  // Малко забавяне между измерванията
+}
+
